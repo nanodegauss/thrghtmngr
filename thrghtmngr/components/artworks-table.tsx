@@ -57,7 +57,16 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export function ArtworksTable() {
+type ArtworksTableProps = {
+  artworks?: Artwork[]
+  data?: Artwork[]
+  hideProjectColumn?: boolean
+}
+
+export function ArtworksTable({ artworks, data, hideProjectColumn }: ArtworksTableProps) {
+  // Unifie les données provenant de artworks ou data
+  const artworksData = data || artworks || [];
+  
   // Solution temporaire : Utilisez les données mockées directement au lieu des hooks de React Query
   // à réactiver lorsque React Query sera pleinement configuré
   // const { data: artworks, isLoading: isLoadingArtworks, error: artworksError } = useArtworks();
@@ -67,7 +76,6 @@ export function ArtworksTable() {
   // });
   
   // Utilisation temporaire des données mockées directement
-  const artworks = mockArtworks;
   const categories = mockArtworkCategories;
   const isLoadingArtworks = false;
   const artworksError = null;
@@ -337,7 +345,7 @@ export function ArtworksTable() {
 
   // Initialiser la table (TOUJOURS initialiser avant les retours conditionnels)
   const table = useReactTable({
-    data: artworks,
+    data: artworksData,
     columns,
     state: {
       sorting,
@@ -378,7 +386,7 @@ export function ArtworksTable() {
     );
   }
 
-  if (artworks.length === 0) {
+  if (artworksData.length === 0) {
     return (
       <div className="p-4 border border-gray-300 bg-gray-50 rounded-md text-center">
         Aucune donnée disponible
