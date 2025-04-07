@@ -9,38 +9,19 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { UsersTable } from "@/components/users-table"
-
-// Données factices pour l'exemple
-const dummyUsers = [
-  {
-    id: "1",
-    role: "admin" as "admin",
-    name: "Jean Dupont",
-    email: "jean.dupont@example.com",
-    department: "Direction",
-    isActive: true,
-  },
-  {
-    id: "2",
-    role: "user" as "user",
-    name: "Marie Martin",
-    email: "marie.martin@example.com",
-    department: "Marketing",
-    isActive: true,
-  },
-  {
-    id: "3",
-    role: "viewer" as "viewer",
-    name: "Pierre Durand",
-    email: "pierre.durand@example.com",
-    department: "Finance",
-    isActive: false,
-  },
-  // Ajoutez d'autres utilisateurs si nécessaire
-]
-
+import { mockUsers } from "@/mocks/data"
 
 export default function UsersPage() {
+  // Adapter le format des données des utilisateurs mockés au format attendu par le composant
+  const formattedUsers = mockUsers.map(user => ({
+    id: user.id,
+    role: user.role as "admin" | "user" | "viewer",
+    name: user.name,
+    email: user.email,
+    department: user.department,
+    isActive: user.active
+  }));
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -64,7 +45,7 @@ export default function UsersPage() {
           </div>
         </header>
       </div>
-      <UsersTable data={dummyUsers} />
+      <UsersTable data={formattedUsers} />
     </div>
   )
 }

@@ -1,5 +1,14 @@
+/**
+ * Page de liste des projets
+ * 
+ * Affiche tous les projets sous forme de cartes avec leurs informations principales.
+ * Permet aux utilisateurs de visualiser et d'accéder rapidement à leurs projets.
+ * 
+ * @component
+ */
+
 import { ProjectCard } from "@/components/project-card"
-import { mockProjects } from "@/services/api"
+import { mockProjectsWithUI } from "@/mocks/data"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -12,15 +21,6 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 
 export default function ProjectsPage() {
-  // Ajouter des données simulées pour le budget dépensé et le nombre d'œuvres
-  const projects = mockProjects.map(project => ({
-    ...project,
-    // Simuler des dépenses aléatoires entre 10% et 90% du budget
-    budget_spent: Math.round(project.budget * (0.1 + Math.random() * 0.8)),
-    // Simuler un nombre aléatoire d'œuvres entre 0 et 15
-    artworks_count: Math.floor(Math.random() * 16)
-  }));
-
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -45,7 +45,7 @@ export default function ProjectsPage() {
         </header>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
+        {mockProjectsWithUI.map((project) => (
           <ProjectCard key={project.id} project={project} />
         ))}
       </div>

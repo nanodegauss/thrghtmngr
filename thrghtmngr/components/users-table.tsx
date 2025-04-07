@@ -1,3 +1,14 @@
+/**
+ * Tableau de gestion des utilisateurs
+ * 
+ * Affiche et permet de gérer les utilisateurs du système avec leurs rôles et permissions.
+ * Ce composant inclut des fonctionnalités de tri, filtrage et pagination des utilisateurs.
+ * 
+ * @component
+ * @param {Object} props - Les propriétés du composant
+ * @param {User[]} props.data - Liste des utilisateurs à afficher dans le tableau
+ */
+
 "use client"
 
 import { useState } from "react"

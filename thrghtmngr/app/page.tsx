@@ -1,3 +1,12 @@
+/**
+ * Page d'accueil / Page de connexion
+ * 
+ * Cette page est la première vue par les utilisateurs. Elle présente un 
+ * formulaire de connexion centré sur l'écran.
+ * 
+ * @component
+ */
+
 import Image from "next/image";
 import Link from 'next/link';
 import { LoginForm } from "@/components/login-form";

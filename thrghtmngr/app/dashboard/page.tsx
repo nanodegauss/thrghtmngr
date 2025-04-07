@@ -1,3 +1,12 @@
+/**
+ * Page du tableau de bord
+ * 
+ * Affiche une vue d'ensemble des projets, tâches et statistiques importantes pour l'utilisateur.
+ * Cette page est accessible après connexion et sert de point d'entrée principal dans l'application.
+ * 
+ * @component
+ */
+
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,

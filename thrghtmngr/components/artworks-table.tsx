@@ -1,3 +1,17 @@
+/**
+ * Tableau des œuvres d'art avec fonctionnalités avancées
+ * 
+ * Ce composant affiche un tableau interactif d'œuvres d'art avec les fonctionnalités suivantes :
+ * - Tri des colonnes
+ * - Filtrage par titre
+ * - Pagination
+ * - Sélection des colonnes à afficher
+ * - Affichage des détails dans un panneau latéral
+ * - Actions de modification et suppression
+ * 
+ * @component
+ */
+
 "use client"
 
 import { useState } from "react"
@@ -57,12 +71,26 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
+/**
+ * Props du composant ArtworksTable
+ * 
+ * @typedef {Object} ArtworksTableProps
+ * @property {Artwork[]} [artworks] - Liste d'œuvres d'art (déprécié, utilisez data à la place)
+ * @property {Artwork[]} [data] - Liste d'œuvres d'art à afficher
+ * @property {boolean} [hideProjectColumn] - Si true, masque la colonne Projet
+ */
 type ArtworksTableProps = {
   artworks?: Artwork[]
   data?: Artwork[]
   hideProjectColumn?: boolean
 }
 
+/**
+ * Tableau des œuvres d'art
+ * 
+ * @param {ArtworksTableProps} props - Propriétés du composant
+ * @returns {JSX.Element} - Composant de tableau d'œuvres d'art
+ */
 export function ArtworksTable({ artworks, data, hideProjectColumn }: ArtworksTableProps) {
   // Unifie les données provenant de artworks ou data
   const artworksData = data || artworks || [];
@@ -83,14 +111,19 @@ export function ArtworksTable({ artworks, data, hideProjectColumn }: ArtworksTab
   // États pour la table
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    // Masquer la colonne projet si demandé
+    project_id: hideProjectColumn ? false : true
+  })
   const [rowSelection, setRowSelection] = useState({})
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   })
   
-  // Définir le statusMap avec un typage correct pour les badges
+  /**
+   * Mappage des statuts d'œuvres vers des badges avec couleurs spécifiques
+   */
   const statusMap: Record<ArtworkStatus, { label: string; variant: "default" | "success" | "secondary" | "warning" | "destructive" }> = {
     available: { label: "Disponible", variant: "default" },
     on_display: { label: "En exposition", variant: "success" },
@@ -98,7 +131,12 @@ export function ArtworksTable({ artworks, data, hideProjectColumn }: ArtworksTab
     on_loan: { label: "En prêt", variant: "warning" },
   };
   
-  // Fonction pour trouver le nom de la catégorie
+  /**
+   * Récupère le nom de la catégorie à partir de son ID
+   * 
+   * @param {string} categoryId - ID de la catégorie
+   * @returns {string} Nom de la catégorie ou "Catégorie inconnue" si non trouvée
+   */
   const getCategoryName = (categoryId: string): string => {
     const category = categories?.find(cat => cat.id === categoryId);
     return category?.name || "Catégorie inconnue";

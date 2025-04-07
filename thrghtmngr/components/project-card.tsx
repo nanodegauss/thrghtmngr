@@ -1,3 +1,21 @@
+/**
+ * Composant ProjectCard
+ * 
+ * Affiche une carte synthétique d'un projet avec ses informations essentielles :
+ * - Titre et description
+ * - Statut (actif, planifié, terminé, etc.)
+ * - Dates de début et fin
+ * - Budget et pourcentage de budget restant
+ * - Nombre d'œuvres associées
+ * 
+ * La carte est interactive et peut être cliquée pour accéder aux détails complets
+ * du projet dans un panneau latéral.
+ * 
+ * @component
+ * @param {Object} props - Les propriétés du composant
+ * @param {Project} props.project - Les données du projet à afficher
+ */
+
 "use client"
 
 import { useState } from "react"
@@ -16,7 +34,7 @@ import {
   ArrowUpDown,
 } from "lucide-react"
 
-import { mockProjects, mockProjectCategories } from "../services/api"
+import { mockProjectsWithUI, mockProjectCategories, statusMap } from "@/mocks/data"
 import { Project } from "../types"
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetClose, SheetFooter } from "@/components/ui/sheet"
@@ -110,7 +128,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
 export function ProjectsDisplay() {
   // Utilisation temporaire des données mockées directement
-  const projects = mockProjects;
+  const projects = mockProjectsWithUI;
   const categories = mockProjectCategories;
   const isLoadingProjects = false;
   const projectsError = null;
@@ -125,15 +143,6 @@ export function ProjectsDisplay() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
   
   const itemsPerPage = 6
-  
-  // Mappages des statuts pour l'affichage
-  const statusMap: Record<string, { label: string; variant: "default" | "success" | "secondary" | "warning" | "destructive" }> = {
-    active: { label: "Actif", variant: "success" },
-    planning: { label: "En planification", variant: "secondary" },
-    completed: { label: "Terminé", variant: "default" },
-    cancelled: { label: "Annulé", variant: "destructive" },
-    paused: { label: "En pause", variant: "warning" },
-  };
   
   // Fonction pour trouver le nom de la catégorie
   const getCategoryName = (categoryId: string): string => {

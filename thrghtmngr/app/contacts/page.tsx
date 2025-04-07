@@ -1,3 +1,18 @@
+/**
+ * Page de gestion des contacts
+ * 
+ * Cette page présente un tableau interactif des contacts du système, permettant
+ * aux utilisateurs de visualiser et gérer l'ensemble des personnes et organisations
+ * avec lesquelles ils interagissent pour négocier les droits d'images.
+ * 
+ * Fonctionnalités :
+ * - Affichage des informations de contact (nom, email, téléphone, adresse)
+ * - Filtrage et tri par différents critères
+ * - Lien direct vers l'email et le téléphone des contacts
+ * 
+ * @component
+ */
+
 import {
   Breadcrumb,
   BreadcrumbItem,

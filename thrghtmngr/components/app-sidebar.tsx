@@ -1,3 +1,20 @@
+/**
+ * Barre latérale principale de l'application
+ * 
+ * Fournit la navigation principale de l'application avec les sections suivantes :
+ * - Tableau de bord
+ * - Projets
+ * - Œuvres d'art
+ * - Contacts
+ * - Gestion des catégories
+ * - Administration des utilisateurs
+ * 
+ * La sidebar est responsive et s'adapte aux écrans mobiles comme aux grands écrans.
+ * Elle peut être réduite en mode icônes uniquement et offre des info-bulles dans ce mode.
+ * 
+ * @component
+ */
+
 "use client"
 
 import * as React from "react"
@@ -24,60 +41,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { mockNavigation } from "@/mocks/data"
 
-const data = {
-  user: {
-    name: "John Doe",
-    email: "john@doe.com",
-    avatar: "/av1tars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Projets",
-      url: "/projects",
-      icon: SquareTerminal,
-      isActive: true,
-    },
-    {
-      title: "Oeuvres",
-      url: "/artworks",
-      icon: Palette,
-    },
-    {
-      title: "Contacts",
-      url: "/contacts",
-      icon: BookOpen,
-    },
-  ],
-  navSecondary: [
-/*     {
-      title: "Catégories",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Historique",
-      url: "#",
-      icon: Send,
-    }, */
-  ],
-  projects: [
-    {
-      name: "Catégories",
-      url: "/category",
-      icon: Tags,
-    },
-    {
-      name: "Historique",
-      url: "#",
-      icon: History,
-    },
-    {
-      name: "Utilisateurs",
-      url: "/users",
-      icon: Users,
-    },
-  ],
+// Mapping des icônes aux noms de chaînes
+const iconMapping = {
+  SquareTerminal,
+  Palette,
+  BookOpen,
+  Tags,
+  History,
+  Users,
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -100,12 +73,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={mockNavigation.navMain.map(item => ({
+          ...item,
+          icon: iconMapping[item.icon as keyof typeof iconMapping]
+        }))} />
+        <NavProjects projects={mockNavigation.projects.map(item => ({
+          ...item,
+          icon: iconMapping[item.icon as keyof typeof iconMapping]
+        }))} />
+        <NavSecondary items={mockNavigation.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={mockNavigation.user} />
       </SidebarFooter>
     </Sidebar>
   )

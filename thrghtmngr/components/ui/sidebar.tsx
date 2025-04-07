@@ -1,3 +1,15 @@
+/**
+ * Composant Sidebar (Barre latérale)
+ * 
+ * Ce composant fournit une barre latérale de navigation responsive pour l'application.
+ * Il gère les états suivants :
+ * - État ouvert/fermé en mode mobile
+ * - Mode replié (iconique) sur desktop
+ * - Persistance des préférences utilisateur via cookie
+ * 
+ * @module
+ */
+
 "use client"
 
 import * as React from "react"
@@ -25,6 +37,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
+/**
+ * Constantes de configuration de la barre latérale
+ */
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"

@@ -1,3 +1,17 @@
+/**
+ * Page de détail d'un projet
+ * 
+ * Affiche les informations détaillées d'un projet spécifique, y compris :
+ * - Titre et description
+ * - Catégorie et dates
+ * - Suivi budgétaire
+ * - Liste des œuvres associées
+ * 
+ * Cette page utilise le paramètre d'URL `id` pour charger les données du projet correspondant.
+ * 
+ * @component
+ */
+
 "use client"
 
 import { useState, useEffect } from "react"

@@ -1,3 +1,17 @@
+/**
+ * Page de gestion des catégories
+ * 
+ * Cette page permet de gérer les différentes catégories utilisées dans l'application :
+ * - Catégories de projets
+ * - Catégories de contacts
+ * - Statuts des œuvres
+ * 
+ * Chaque section affiche un tableau des éléments existants et permet d'ajouter,
+ * modifier ou supprimer des entrées via des dialogues dédiés.
+ * 
+ * @component
+ */
+
 "use client"
 
 import {
