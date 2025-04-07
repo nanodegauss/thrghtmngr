@@ -148,10 +148,6 @@ export function UsersTable() {
                     />
                     <Label htmlFor="active">Compte actif</Label>
                   </div>
-                  <div className="grid gap-4">
-                    <Label htmlFor="password">Nouveau mot de passe</Label>
-                    <Input id="password" type="password" placeholder="Laisser vide pour ne pas modifier" />
-                  </div>
                 </form>
               </div>
             </div>
@@ -224,7 +220,6 @@ export function UsersTable() {
       cell: ({ row }) => {
         return (
           <div className="flex items-center">
-            <BadgeIcon className="h-4 w-4 mr-2 text-gray-500" />
             {row.getValue("department")}
           </div>
         );
@@ -276,14 +271,6 @@ export function UsersTable() {
       cell: ({ row }) => {
         return (
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => console.log("Modifier", row.original.id)}
-            >
-              <PencilIcon className="h-4 w-4" />
-              <span className="sr-only">Modifier</span>
-            </Button>
             <Button
               variant="ghost"
               size="icon"

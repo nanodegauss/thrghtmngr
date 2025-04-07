@@ -4,7 +4,21 @@ import {
     ProjectCategory, ContactCategory, ArtworkStatus
   } from '../types';
   
-    
+
+  // Interface pour les statuts d'œuvres avec description
+  interface WorkStatusWithDescription {
+    id: string;
+    name: string;
+    description: string;
+}
+  // Données mockées pour les statuts d'œuvres
+const mockWorkStatuses: WorkStatusWithDescription[] = [
+  { id: "available", name: "Disponible", description: "Œuvre disponible pour exposition", created_at: "2023-01-01T00:00:00.000Z" },
+  { id: "on_display", name: "Exposée", description: "Actuellement exposée au public", created_at: "2023-01-01T00:00:00.000Z" },
+  { id: "stored", name: "En réserve", description: "Conservée dans les réserves du musée", created_at: "2023-01-01T00:00:00.000Z" },
+  { id: "on_loan", name: "En prêt", description: "Prêtée à une autre institution", created_at: "2023-01-01T00:00:00.000Z" }
+];
+
   // Données mockées pour les utilisateurs
   const mockUsers: User[] = [
     {
@@ -295,6 +309,7 @@ import {
   
   // Services pour les catégories
   export const categoryService = {
+    // Méthodes existantes
     getArtworkCategories: async (): Promise<ArtworkCategory[]> => {
       await new Promise(resolve => setTimeout(resolve, 300));
       return [...mockArtworkCategories];
@@ -307,11 +322,134 @@ import {
     
     getContactCategories: async (): Promise<ContactCategory[]> => {
       await new Promise(resolve => setTimeout(resolve, 300));
-      return [];
+      return [...mockContactCategories];
+    },
+    
+    // Nouvelles méthodes pour les catégories de projet
+    createProjectCategory: async (data: { name: string, description?: string }): Promise<ProjectCategory> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const newCategory: ProjectCategory = {
+        id: Math.random().toString(36).substring(2, 10),
+        name: data.name,
+        description: data.description || "",
+        created_at: new Date().toISOString()
+      };
+      
+      mockProjectCategories.push(newCategory);
+      return newCategory;
+    },
+    
+    updateProjectCategory: async (id: string, data: { name?: string, description?: string }): Promise<ProjectCategory | undefined> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const index = mockProjectCategories.findIndex(category => category.id === id);
+      if (index === -1) return undefined;
+      
+      mockProjectCategories[index] = { ...mockProjectCategories[index], ...data };
+      return mockProjectCategories[index];
+    },
+    
+    deleteProjectCategory: async (id: string): Promise<boolean> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const index = mockProjectCategories.findIndex(category => category.id === id);
+      if (index === -1) return false;
+      
+      mockProjectCategories.splice(index, 1);
+      return true;
+    },
+    
+    // Nouvelles méthodes pour les catégories de contact
+    createContactCategory: async (data: { name: string, description?: string }): Promise<ContactCategory> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const newCategory: ContactCategory = {
+        id: Math.random().toString(36).substring(2, 10),
+        name: data.name,
+        description: data.description || "",
+        created_at: new Date().toISOString()
+      };
+      
+      mockContactCategories.push(newCategory);
+      return newCategory;
+    },
+    
+    updateContactCategory: async (id: string, data: { name?: string, description?: string }): Promise<ContactCategory | undefined> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const index = mockContactCategories.findIndex(category => category.id === id);
+      if (index === -1) return undefined;
+      
+      mockContactCategories[index] = { ...mockContactCategories[index], ...data };
+      return mockContactCategories[index];
+    },
+    
+    deleteContactCategory: async (id: string): Promise<boolean> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const index = mockContactCategories.findIndex(category => category.id === id);
+      if (index === -1) return false;
+      
+      mockContactCategories.splice(index, 1);
+      return true;
     }
   };
   
-  // Export des données mockées pour utilisation directe dans les composants si nécessaire
+  // Nouveau service pour les statuts d'œuvres
+  export const workStatusService = {
+    getWorkStatuses: async (): Promise<WorkStatusWithDescription[]> => {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return [...mockWorkStatuses];
+    },
+    
+    getWorkStatusById: async (id: string): Promise<WorkStatusWithDescription | undefined> => {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return mockWorkStatuses.find(status => status.id === id);
+    },
+    
+    createWorkStatus: async (data: { name: string, description?: string }): Promise<WorkStatusWithDescription> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const newStatus: WorkStatusWithDescription = {
+        id: data.name.toLowerCase().replace(/\s+/g, '_'),
+        name: data.name,
+        description: data.description || "",
+        created_at: new Date().toISOString()
+      };
+      
+      mockWorkStatuses.push(newStatus);
+      return newStatus;
+    },
+    
+    updateWorkStatus: async (id: string, data: { name?: string, description?: string }): Promise<WorkStatusWithDescription | undefined> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const index = mockWorkStatuses.findIndex(status => status.id === id);
+      if (index === -1) return undefined;
+      
+      mockWorkStatuses[index] = { 
+        ...mockWorkStatuses[index], 
+        ...data,
+        // Mettre à jour l'id si le nom change
+        ...(data.name ? { id: data.name.toLowerCase().replace(/\s+/g, '_') } : {})
+      };
+      
+      return mockWorkStatuses[index];
+    },
+    
+    deleteWorkStatus: async (id: string): Promise<boolean> => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const index = mockWorkStatuses.findIndex(status => status.id === id);
+      if (index === -1) return false;
+      
+      mockWorkStatuses.splice(index, 1);
+      return true;
+    }
+  };
+  
+  // Export des données mockées mis à jour
   export {
     mockUsers,
     mockArtworks,
@@ -319,5 +457,6 @@ import {
     mockContacts,
     mockArtworkCategories,
     mockProjectCategories,
-    mockContactCategories
+    mockContactCategories,
+    mockWorkStatuses
   };

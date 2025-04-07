@@ -44,6 +44,70 @@ import {
 } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  category_id: string;
+  start_date: string;
+  end_date: string;
+  budget: number;
+  budget_spent?: number; 
+  artworks_count?: number;
+  // autres propriétés...
+}
+
+interface ProjectCardProps {
+  project: Project;
+}
+
+export function ProjectCard({ project }: ProjectCardProps) {
+  // Calculer le pourcentage de budget restant
+  const budgetSpent = project.budget_spent || 0;
+  const budgetRemaining = project.budget - budgetSpent;
+  const budgetRemainingPercentage = Math.round((budgetRemaining / project.budget) * 100);
+  
+  // Nombre d'œuvres (utilisez la propriété si elle existe, sinon 0)
+  const artworksCount = project.artworks_count || 0;
+  
+  return (
+    <Card className="cursor-pointer hover:shadow-md transition-shadow">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <Badge variant="default">
+            {project.status}
+          </Badge>
+          <Badge variant="outline">{artworksCount} œuvre{artworksCount > 1 ? 's' : ''}</Badge>
+        </div>
+        <CardTitle className="mt-2">{project.title}</CardTitle>
+        <CardDescription className="line-clamp-2">
+          {project.description}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col space-y-2 text-sm">
+          <div className="flex items-center text-muted-foreground">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            <span>
+              Du {new Date(project.start_date).toLocaleDateString('fr-FR')} au {new Date(project.end_date).toLocaleDateString('fr-FR')}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="pt-2">
+        <div className="flex w-full justify-between items-center">
+          <div className="font-semibold">{new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(project.budget)}</div>
+          <Badge variant={budgetRemainingPercentage > 50 ? "success" : budgetRemainingPercentage > 20 ? "warning" : "destructive"}>
+            {budgetRemainingPercentage}% restant
+          </Badge>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+}
+
+
 export function ProjectsDisplay() {
   // Utilisation temporaire des données mockées directement
   const projects = mockProjects;

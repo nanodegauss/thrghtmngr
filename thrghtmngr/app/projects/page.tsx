@@ -1,4 +1,5 @@
 import { ProjectCard } from "@/components/project-card"
+import { mockProjects } from "@/services/api"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -10,38 +11,16 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 
-// Types pour les projets
-interface Project {
-  id: string
-  title: string
-  startDate: string
-  endDate: string
-  budget: number
-  budgetSpent: number
-  artworksCount: number
-  category: string
-  isActive: boolean
-  description: string
-}
-
-// Données de test
-const projects: Project[] = [
-  {
-    id: "1",
-    title: "Exposition Printemps 2024",
-    startDate: "2024-03-01",
-    endDate: "2024-06-30",
-    budget: 50000,
-    budgetSpent: 30000,
-    artworksCount: 25,
-    category: "Exposition",
-    isActive: true,
-    description: "Exposition temporaire présentant les œuvres de jeunes artistes émergents."
-  },
-  // ... autres projets
-]
-
 export default function ProjectsPage() {
+  // Ajouter des données simulées pour le budget dépensé et le nombre d'œuvres
+  const projects = mockProjects.map(project => ({
+    ...project,
+    // Simuler des dépenses aléatoires entre 10% et 90% du budget
+    budget_spent: Math.round(project.budget * (0.1 + Math.random() * 0.8)),
+    // Simuler un nombre aléatoire d'œuvres entre 0 et 15
+    artworks_count: Math.floor(Math.random() * 16)
+  }));
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">

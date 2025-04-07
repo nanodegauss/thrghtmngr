@@ -34,7 +34,7 @@ const data = {
   navMain: [
     {
       title: "Projets",
-      url: "/projets",
+      url: "/projects",
       icon: SquareTerminal,
       isActive: true,
     },
@@ -64,7 +64,7 @@ const data = {
   projects: [
     {
       name: "Catégories",
-      url: "#",
+      url: "/category",
       icon: Tags,
     },
     {

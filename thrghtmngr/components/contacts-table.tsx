@@ -25,6 +25,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  UserIcon,
 } from "lucide-react"
 
 import { useQuery } from "@tanstack/react-query"
@@ -382,7 +383,12 @@ export function ContactsTable() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+                <Button variant="default">
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  Nouveau contact
+                </Button>
       </div>
+
 
       <div className="rounded-md border">
         <Table>
