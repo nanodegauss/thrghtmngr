@@ -22,19 +22,21 @@ import {
   ArrowUpDown,
   PencilIcon,
   TrashIcon,
+  Mail,
+  Phone,
+  MapPin,
 } from "lucide-react"
 
-import { useArtworks } from "../hooks/useArtworks"
 import { useQuery } from "@tanstack/react-query"
-import { categoryService, mockArtworks, mockArtworkCategories } from "../services/api"
-import { Artwork, ArtworkStatus } from "../types"
+import { categoryService, mockContacts, mockContactCategories } from "../services/api"
+import { Contact } from "../types"
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetClose, SheetFooter } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -57,20 +59,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export function ArtworksTable() {
-  // Solution temporaire : Utilisez les données mockées directement au lieu des hooks de React Query
-  // à réactiver lorsque React Query sera pleinement configuré
-  // const { data: artworks, isLoading: isLoadingArtworks, error: artworksError } = useArtworks();
-  // const { data: categories } = useQuery({
-  //   queryKey: ['artwork-categories'],
-  //   queryFn: categoryService.getArtworkCategories
-  // });
-  
+export function ContactsTable() {
   // Utilisation temporaire des données mockées directement
-  const artworks = mockArtworks;
-  const categories = mockArtworkCategories;
-  const isLoadingArtworks = false;
-  const artworksError = null;
+  const contacts = mockContacts;
+  const categories = mockContactCategories || [];
+  const isLoadingContacts = false;
+  const contactsError = null;
   
   // États pour la table
   const [sorting, setSorting] = useState<SortingState>([])
@@ -82,14 +76,6 @@ export function ArtworksTable() {
     pageSize: 10,
   })
   
-  // Définir le statusMap avec un typage correct pour les badges
-  const statusMap: Record<ArtworkStatus, { label: string; variant: "default" | "success" | "secondary" | "warning" | "destructive" }> = {
-    available: { label: "Disponible", variant: "default" },
-    on_display: { label: "En exposition", variant: "success" },
-    stored: { label: "En réserve", variant: "secondary" },
-    on_loan: { label: "En prêt", variant: "warning" },
-  };
-  
   // Fonction pour trouver le nom de la catégorie
   const getCategoryName = (categoryId: string): string => {
     const category = categories?.find(cat => cat.id === categoryId);
@@ -97,50 +83,15 @@ export function ArtworksTable() {
   };
 
   // Définition des colonnes de la table
-  const columns: ColumnDef<Artwork>[] = [
+  const columns: ColumnDef<Contact>[] = [
     {
-      accessorKey: "status",
+      accessorKey: "name",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Statut
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => {
-        const status = row.getValue("status") as ArtworkStatus;
-        return (
-          <Badge variant={statusMap[status].variant}>
-            {statusMap[status].label}
-          </Badge>
-        );
-      },
-    },
-    {
-      accessorKey: "image_url",
-      header: "Vignette",
-      cell: ({ row }) => (
-        <div className="relative w-12 h-12">
-          <img
-            src={row.getValue("image_url") || "/placeholder-artwork.jpg"}
-            alt={`Vignette de ${row.getValue("title")}`}
-            className="absolute inset-0 w-full h-full rounded-md object-cover"
-            style={{ objectPosition: "center" }}
-          />
-        </div>
-      ),
-      enableSorting: false,
-    },
-    {
-      accessorKey: "title",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Titre
+          Nom
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -148,70 +99,60 @@ export function ArtworksTable() {
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="link" className="w-fit px-0 text-left text-foreground">
-              {row.getValue("title")}
+              {row.getValue("name")}
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="sm:max-w-2xl w-full p-6">
             <SheetHeader className="space-y-2 pb-4">
-              <SheetTitle className="text-2xl">{row.getValue("title")}</SheetTitle>
+              <SheetTitle className="text-2xl">{row.getValue("name")}</SheetTitle>
               <SheetDescription>
-                Détails et modifications de l'œuvre
+                Détails et modifications du contact
               </SheetDescription>
             </SheetHeader>
             <Separator className="my-4" />
             <div className="relative flex-1 overflow-y-auto">
               <div className="space-y-6">
-                <div className="aspect-square w-full relative rounded-lg overflow-hidden">
-                  <img
-                    src={row.getValue("image_url") || "/placeholder-artwork.jpg"}
-                    alt={row.getValue("title")}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
                 <form className="grid gap-6">
                   <div className="grid gap-4">
-                    <Label htmlFor="title">Titre</Label>
-                    <Input id="title" defaultValue={row.getValue("title")} />
+                    <Label htmlFor="name">Nom</Label>
+                    <Input id="name" defaultValue={row.getValue("name")} />
+                  </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="contact_person">Personne à contacter</Label>
+                    <Input id="contact_person" defaultValue={row.original.contact_person} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-4">
-                      <Label htmlFor="author">Auteur</Label>
-                      <Input id="author" defaultValue={row.getValue("author")} />
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" type="email" defaultValue={row.original.email} />
                     </div>
                     <div className="grid gap-4">
-                      <Label htmlFor="status">Statut</Label>
-                      <Select defaultValue={row.getValue("status")}>
-                        <SelectTrigger id="status">
-                          <SelectValue placeholder="Sélectionner un statut" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="available">Disponible</SelectItem>
-                          <SelectItem value="on_display">En exposition</SelectItem>
-                          <SelectItem value="stored">En réserve</SelectItem>
-                          <SelectItem value="on_loan">En prêt</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="phone">Téléphone</Label>
+                      <Input id="phone" defaultValue={row.original.phone} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-4">
-                      <Label htmlFor="period">Période</Label>
-                      <Input id="period" defaultValue={row.original.period} />
-                    </div>
-                    <div className="grid gap-4">
-                      <Label htmlFor="origin">Provenance</Label>
-                      <Input id="origin" defaultValue={row.original.origin} />
-                    </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="address">Adresse</Label>
+                    <Textarea id="address" defaultValue={row.original.address} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-4">
-                      <Label htmlFor="exhibition_number">N° Exposition</Label>
-                      <Input id="exhibition_number" defaultValue={row.original.exhibition_number} />
-                    </div>
-                    <div className="grid gap-4">
-                      <Label htmlFor="reference">Référence</Label>
-                      <Input id="reference" defaultValue={row.original.reference} />
-                    </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="notes">Notes</Label>
+                    <Textarea id="notes" defaultValue={row.original.notes} />
+                  </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="category">Catégorie</Label>
+                    <Select defaultValue={row.original.category_id}>
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Sélectionner une catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </form>
               </div>
@@ -228,69 +169,87 @@ export function ArtworksTable() {
       ),
     },
     {
-      accessorKey: "author",
+      accessorKey: "contact_person",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Auteur
+          Contact
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
     },
     {
-      accessorKey: "project_id",
+      accessorKey: "email",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Projet
+          Email
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => {
-        // Ce serait idéal d'avoir le nom du projet ici au lieu de l'ID
-        // Une fois que vous aurez un hook useProjects ou similaire
-        return row.getValue("project_id") || "Sans projet";
-      }
+        const email = row.getValue("email") as string;
+        return (
+          <a 
+            href={`mailto:${email}`} 
+            className="flex items-center hover:underline text-blue-600"
+          >
+            <Mail className="h-4 w-4 mr-2" />
+            {email}
+          </a>
+        );
+      },
     },
     {
-      accessorKey: "exhibition_number",
+      accessorKey: "phone",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          N° Expo
+          Téléphone
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
+      cell: ({ row }) => {
+        const phone = row.getValue("phone") as string;
+        return (
+          <a 
+            href={`tel:${phone}`} 
+            className="flex items-center hover:underline text-blue-600"
+          >
+            <Phone className="h-4 w-4 mr-2" />
+            {phone}
+          </a>
+        );
+      },
     },
     {
-      accessorKey: "reference",
+      accessorKey: "address",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Référence
+          Adresse
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-    },
-    {
-      accessorKey: "origin",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Provenance
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      cell: ({ row }) => {
+        const address = row.getValue("address") as string;
+        return (
+          <div className="flex items-center">
+            <MapPin className="h-4 w-4 mr-2 text-gray-500" />
+            <span className="truncate max-w-xs" title={address}>
+              {address}
+            </span>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "category_id",
@@ -337,7 +296,7 @@ export function ArtworksTable() {
 
   // Initialiser la table (TOUJOURS initialiser avant les retours conditionnels)
   const table = useReactTable({
-    data: artworks,
+    data: contacts,
     columns,
     state: {
       sorting,
@@ -359,29 +318,29 @@ export function ArtworksTable() {
   })
 
   // Afficher un état de chargement APRÈS l'initialisation de tous les hooks
-  if (isLoadingArtworks) {
+  if (isLoadingContacts) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-solid border-current border-r-transparent mb-4"></div>
-          <p>Chargement des œuvres d'art...</p>
+          <p>Chargement des contacts...</p>
         </div>
       </div>
     );
   }
 
-  if (artworksError) {
+  if (contactsError) {
     return (
       <div className="p-4 border border-red-300 bg-red-50 text-red-700 rounded-md">
-        Erreur: {(artworksError as Error).message}
+        Erreur: {(contactsError as Error).message}
       </div>
     );
   }
 
-  if (artworks.length === 0) {
+  if (contacts.length === 0) {
     return (
       <div className="p-4 border border-gray-300 bg-gray-50 rounded-md text-center">
-        Aucune donnée disponible
+        Aucun contact disponible
       </div>
     );
   }
@@ -391,10 +350,10 @@ export function ArtworksTable() {
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-2">
           <Input
-            placeholder="Filtrer par titre..."
-            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            placeholder="Filtrer par nom..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table.getColumn("title")?.setFilterValue(event.target.value)
+              table.getColumn("name")?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
           />
@@ -474,7 +433,7 @@ export function ArtworksTable() {
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
+          {table.getFilteredRowModel().rows.length} contact(s) sélectionné(s).
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">

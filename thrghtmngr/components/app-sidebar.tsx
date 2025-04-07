@@ -45,7 +45,7 @@ const data = {
     },
     {
       title: "Contacts",
-      url: "#",
+      url: "/contacts",
       icon: BookOpen,
     },
   ],
@@ -74,7 +74,7 @@ const data = {
     },
     {
       name: "Utilisateurs",
-      url: "#",
+      url: "/users",
       icon: Users,
     },
   ],

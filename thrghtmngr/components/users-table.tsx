@@ -22,12 +22,14 @@ import {
   ArrowUpDown,
   PencilIcon,
   TrashIcon,
+  Mail,
+  UserIcon,
+  Badge as BadgeIcon,
+  CalendarIcon,
 } from "lucide-react"
 
-import { useArtworks } from "../hooks/useArtworks"
-import { useQuery } from "@tanstack/react-query"
-import { categoryService, mockArtworks, mockArtworkCategories } from "../services/api"
-import { Artwork, ArtworkStatus } from "../types"
+import { mockUsers } from "../services/api"
+import { User } from "../types"
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetClose, SheetFooter } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
@@ -35,6 +37,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -57,20 +60,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export function ArtworksTable() {
-  // Solution temporaire : Utilisez les données mockées directement au lieu des hooks de React Query
-  // à réactiver lorsque React Query sera pleinement configuré
-  // const { data: artworks, isLoading: isLoadingArtworks, error: artworksError } = useArtworks();
-  // const { data: categories } = useQuery({
-  //   queryKey: ['artwork-categories'],
-  //   queryFn: categoryService.getArtworkCategories
-  // });
-  
+export function UsersTable() {
   // Utilisation temporaire des données mockées directement
-  const artworks = mockArtworks;
-  const categories = mockArtworkCategories;
-  const isLoadingArtworks = false;
-  const artworksError = null;
+  const users = mockUsers;
+  const isLoadingUsers = false;
+  const usersError = null;
   
   // États pour la table
   const [sorting, setSorting] = useState<SortingState>([])
@@ -82,65 +76,23 @@ export function ArtworksTable() {
     pageSize: 10,
   })
   
-  // Définir le statusMap avec un typage correct pour les badges
-  const statusMap: Record<ArtworkStatus, { label: string; variant: "default" | "success" | "secondary" | "warning" | "destructive" }> = {
-    available: { label: "Disponible", variant: "default" },
-    on_display: { label: "En exposition", variant: "success" },
-    stored: { label: "En réserve", variant: "secondary" },
-    on_loan: { label: "En prêt", variant: "warning" },
-  };
-  
-  // Fonction pour trouver le nom de la catégorie
-  const getCategoryName = (categoryId: string): string => {
-    const category = categories?.find(cat => cat.id === categoryId);
-    return category?.name || "Catégorie inconnue";
+  // Mappages des rôles pour l'affichage
+  const roleMap: Record<string, { label: string; variant: "default" | "success" | "secondary" | "destructive" }> = {
+    admin: { label: "Administrateur", variant: "destructive" },
+    user: { label: "Utilisateur", variant: "default" },
+    viewer: { label: "Visiteur", variant: "secondary" },
   };
 
   // Définition des colonnes de la table
-  const columns: ColumnDef<Artwork>[] = [
+  const columns: ColumnDef<User>[] = [
     {
-      accessorKey: "status",
+      accessorKey: "name",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Statut
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => {
-        const status = row.getValue("status") as ArtworkStatus;
-        return (
-          <Badge variant={statusMap[status].variant}>
-            {statusMap[status].label}
-          </Badge>
-        );
-      },
-    },
-    {
-      accessorKey: "image_url",
-      header: "Vignette",
-      cell: ({ row }) => (
-        <div className="relative w-12 h-12">
-          <img
-            src={row.getValue("image_url") || "/placeholder-artwork.jpg"}
-            alt={`Vignette de ${row.getValue("title")}`}
-            className="absolute inset-0 w-full h-full rounded-md object-cover"
-            style={{ objectPosition: "center" }}
-          />
-        </div>
-      ),
-      enableSorting: false,
-    },
-    {
-      accessorKey: "title",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Titre
+          Nom
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -148,70 +100,57 @@ export function ArtworksTable() {
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="link" className="w-fit px-0 text-left text-foreground">
-              {row.getValue("title")}
+              {row.getValue("name")}
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="sm:max-w-2xl w-full p-6">
             <SheetHeader className="space-y-2 pb-4">
-              <SheetTitle className="text-2xl">{row.getValue("title")}</SheetTitle>
+              <SheetTitle className="text-2xl">{row.getValue("name")}</SheetTitle>
               <SheetDescription>
-                Détails et modifications de l'œuvre
+                Détails et modifications de l'utilisateur
               </SheetDescription>
             </SheetHeader>
             <Separator className="my-4" />
             <div className="relative flex-1 overflow-y-auto">
               <div className="space-y-6">
-                <div className="aspect-square w-full relative rounded-lg overflow-hidden">
-                  <img
-                    src={row.getValue("image_url") || "/placeholder-artwork.jpg"}
-                    alt={row.getValue("title")}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
                 <form className="grid gap-6">
                   <div className="grid gap-4">
-                    <Label htmlFor="title">Titre</Label>
-                    <Input id="title" defaultValue={row.getValue("title")} />
+                    <Label htmlFor="name">Nom</Label>
+                    <Input id="name" defaultValue={row.getValue("name")} />
+                  </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" defaultValue={row.original.email} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-4">
-                      <Label htmlFor="author">Auteur</Label>
-                      <Input id="author" defaultValue={row.getValue("author")} />
-                    </div>
-                    <div className="grid gap-4">
-                      <Label htmlFor="status">Statut</Label>
-                      <Select defaultValue={row.getValue("status")}>
-                        <SelectTrigger id="status">
-                          <SelectValue placeholder="Sélectionner un statut" />
+                      <Label htmlFor="role">Rôle</Label>
+                      <Select defaultValue={row.original.role}>
+                        <SelectTrigger id="role">
+                          <SelectValue placeholder="Sélectionner un rôle" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="available">Disponible</SelectItem>
-                          <SelectItem value="on_display">En exposition</SelectItem>
-                          <SelectItem value="stored">En réserve</SelectItem>
-                          <SelectItem value="on_loan">En prêt</SelectItem>
+                          <SelectItem value="admin">Administrateur</SelectItem>
+                          <SelectItem value="user">Utilisateur</SelectItem>
+                          <SelectItem value="viewer">Visiteur</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-4">
-                      <Label htmlFor="period">Période</Label>
-                      <Input id="period" defaultValue={row.original.period} />
-                    </div>
-                    <div className="grid gap-4">
-                      <Label htmlFor="origin">Provenance</Label>
-                      <Input id="origin" defaultValue={row.original.origin} />
+                      <Label htmlFor="department">Département</Label>
+                      <Input id="department" defaultValue={row.original.department} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-4">
-                      <Label htmlFor="exhibition_number">N° Exposition</Label>
-                      <Input id="exhibition_number" defaultValue={row.original.exhibition_number} />
-                    </div>
-                    <div className="grid gap-4">
-                      <Label htmlFor="reference">Référence</Label>
-                      <Input id="reference" defaultValue={row.original.reference} />
-                    </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch 
+                      id="active" 
+                      defaultChecked={row.original.active}
+                    />
+                    <Label htmlFor="active">Compte actif</Label>
+                  </div>
+                  <div className="grid gap-4">
+                    <Label htmlFor="password">Nouveau mot de passe</Label>
+                    <Input id="password" type="password" placeholder="Laisser vide pour ne pas modifier" />
                   </div>
                 </form>
               </div>
@@ -228,83 +167,108 @@ export function ArtworksTable() {
       ),
     },
     {
-      accessorKey: "author",
+      accessorKey: "email",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Auteur
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-    },
-    {
-      accessorKey: "project_id",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Projet
+          Email
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => {
-        // Ce serait idéal d'avoir le nom du projet ici au lieu de l'ID
-        // Une fois que vous aurez un hook useProjects ou similaire
-        return row.getValue("project_id") || "Sans projet";
-      }
+        const email = row.getValue("email") as string;
+        return (
+          <a 
+            href={`mailto:${email}`} 
+            className="flex items-center hover:underline text-blue-600"
+          >
+            <Mail className="h-4 w-4 mr-2" />
+            {email}
+          </a>
+        );
+      },
     },
     {
-      accessorKey: "exhibition_number",
+      accessorKey: "role",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          N° Expo
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-    },
-    {
-      accessorKey: "reference",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Référence
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-    },
-    {
-      accessorKey: "origin",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Provenance
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-    },
-    {
-      accessorKey: "category_id",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Catégorie
+          Rôle
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => {
-        return getCategoryName(row.getValue("category_id"));
+        const role = row.getValue("role") as string;
+        return (
+          <Badge variant={roleMap[role]?.variant || "default"}>
+            {roleMap[role]?.label || role}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "department",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Département
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center">
+            <BadgeIcon className="h-4 w-4 mr-2 text-gray-500" />
+            {row.getValue("department")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "active",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Statut
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const isActive = row.getValue("active") as boolean;
+        return (
+          <Badge variant={isActive ? "success" : "destructive"}>
+            {isActive ? "Actif" : "Inactif"}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "created_at",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date de création
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const date = new Date(row.getValue("created_at") as string);
+        return (
+          <div className="flex items-center">
+            <CalendarIcon className="h-4 w-4 mr-2 text-gray-500" />
+            {date.toLocaleDateString('fr-FR')}
+          </div>
+        );
       },
     },
     {
@@ -337,7 +301,7 @@ export function ArtworksTable() {
 
   // Initialiser la table (TOUJOURS initialiser avant les retours conditionnels)
   const table = useReactTable({
-    data: artworks,
+    data: users,
     columns,
     state: {
       sorting,
@@ -359,29 +323,29 @@ export function ArtworksTable() {
   })
 
   // Afficher un état de chargement APRÈS l'initialisation de tous les hooks
-  if (isLoadingArtworks) {
+  if (isLoadingUsers) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-solid border-current border-r-transparent mb-4"></div>
-          <p>Chargement des œuvres d'art...</p>
+          <p>Chargement des utilisateurs...</p>
         </div>
       </div>
     );
   }
 
-  if (artworksError) {
+  if (usersError) {
     return (
       <div className="p-4 border border-red-300 bg-red-50 text-red-700 rounded-md">
-        Erreur: {(artworksError as Error).message}
+        Erreur: {(usersError as Error).message}
       </div>
     );
   }
 
-  if (artworks.length === 0) {
+  if (users.length === 0) {
     return (
       <div className="p-4 border border-gray-300 bg-gray-50 rounded-md text-center">
-        Aucune donnée disponible
+        Aucun utilisateur disponible
       </div>
     );
   }
@@ -391,10 +355,10 @@ export function ArtworksTable() {
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-2">
           <Input
-            placeholder="Filtrer par titre..."
-            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            placeholder="Filtrer par nom..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table.getColumn("title")?.setFilterValue(event.target.value)
+              table.getColumn("name")?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
           />
@@ -423,6 +387,10 @@ export function ArtworksTable() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+        <Button variant="default">
+          <UserIcon className="mr-2 h-4 w-4" />
+          Nouvel utilisateur
+        </Button>
       </div>
 
       <div className="rounded-md border">
@@ -474,7 +442,7 @@ export function ArtworksTable() {
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
+          {table.getFilteredRowModel().rows.length} utilisateur(s) sélectionné(s).
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
