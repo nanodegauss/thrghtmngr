@@ -7,12 +7,14 @@
  * - services/user.service.ts
  * - services/artwork.service.ts
  * - services/project.service.ts
+ * - services/category.service.ts
  */
 
 // Réexportation des services pour assurer la compatibilité avec le code existant
 import * as userServiceFunctions from './user.service';
 import * as artworkServiceFunctions from './artwork.service';
 import * as projectServiceFunctions from './project.service';
+import * as categoryServiceFunctions from './category.service';
 
 // Réexportation des données mockées depuis leur nouvel emplacement (pour la compatibilité)
 export { 
@@ -52,4 +54,26 @@ export const projectService = {
   createProject: projectServiceFunctions.createProject,
   updateProject: projectServiceFunctions.updateProject,
   deleteProject: projectServiceFunctions.deleteProject
+};
+
+// Ajout du service de catégories pour résoudre l'erreur d'importation
+export const categoryService = {
+  // Catégories de projets
+  getProjectCategories: categoryServiceFunctions.getProjectCategories,
+  getProjectCategoryById: categoryServiceFunctions.getProjectCategoryById,
+  createProjectCategory: categoryServiceFunctions.createProjectCategory,
+  updateProjectCategory: categoryServiceFunctions.updateProjectCategory,
+  deleteProjectCategory: categoryServiceFunctions.deleteProjectCategory,
+  
+  // Catégories de contacts
+  getContactCategories: categoryServiceFunctions.getContactCategories,
+  createContactCategory: categoryServiceFunctions.createContactCategory,
+  updateContactCategory: categoryServiceFunctions.updateContactCategory,
+  deleteContactCategory: categoryServiceFunctions.deleteContactCategory,
+  
+  // Statuts des œuvres
+  getWorkStatuses: categoryServiceFunctions.getWorkStatuses,
+  createWorkStatus: categoryServiceFunctions.createWorkStatus,
+  updateWorkStatus: categoryServiceFunctions.updateWorkStatus,
+  deleteWorkStatus: categoryServiceFunctions.deleteWorkStatus
 };

@@ -5,7 +5,7 @@
 
 import { 
   User, Artwork, Project, Contact, Media, Task, 
-  ArtworkCategory, ProjectCategory, ContactCategory, ArtworkStatus
+  ArtworkCategory, ProjectCategory, ContactCategory, ArtworkStatus, ArtworkRightsHolder, ArtworkRightsMedia
 } from '../types';
 
 /**
@@ -242,6 +242,93 @@ export const mockContacts: Contact[] = [
     category_id: "2",
     created_by: "1",
     created_at: "2023-01-21T13:30:00.000Z"
+  }
+];
+
+/**
+ * Médias (supports) mockés pour les droits d'œuvres
+ */
+export const mockMedia: Media[] = [
+  { id: "1", name: "Print", created_by: "1", created_at: "2023-01-05T10:00:00.000Z" },
+  { id: "2", name: "Web", created_by: "1", created_at: "2023-01-05T10:10:00.000Z" },
+  { id: "3", name: "Exposition", created_by: "1", created_at: "2023-01-05T10:20:00.000Z" },
+  { id: "4", name: "Télévision", created_by: "1", created_at: "2023-01-05T10:30:00.000Z" },
+  { id: "5", name: "Réseaux sociaux", created_by: "1", created_at: "2023-01-05T10:40:00.000Z" }
+];
+
+/**
+ * Ayants droits mockés pour les œuvres d'art
+ */
+export const mockArtworkRightsHolders: ArtworkRightsHolder[] = [
+  { 
+    id: "1", 
+    artwork_id: "1", 
+    contact_id: "1", 
+    price: 500, 
+    created_at: "2023-01-25T14:30:00.000Z" 
+  },
+  { 
+    id: "2", 
+    artwork_id: "1", 
+    contact_id: "2", 
+    price: 300, 
+    created_at: "2023-01-26T09:20:00.000Z" 
+  },
+  { 
+    id: "3", 
+    artwork_id: "2", 
+    contact_id: "1", 
+    price: 700, 
+    created_at: "2023-01-27T16:45:00.000Z" 
+  },
+  { 
+    id: "4", 
+    artwork_id: "3", 
+    contact_id: "2", 
+    price: 400, 
+    created_at: "2023-01-28T11:10:00.000Z" 
+  }
+];
+
+/**
+ * Associations entre ayants droits et médias (supports) mockées
+ */
+export const mockArtworkRightsMedia: ArtworkRightsMedia[] = [
+  { 
+    id: "1", 
+    artwork_rights_holder_id: "1", 
+    media_id: "1", 
+    created_at: "2023-01-25T14:35:00.000Z" 
+  },
+  { 
+    id: "2", 
+    artwork_rights_holder_id: "1", 
+    media_id: "2", 
+    created_at: "2023-01-25T14:36:00.000Z" 
+  },
+  { 
+    id: "3", 
+    artwork_rights_holder_id: "2", 
+    media_id: "3", 
+    created_at: "2023-01-26T09:25:00.000Z" 
+  },
+  { 
+    id: "4", 
+    artwork_rights_holder_id: "3", 
+    media_id: "1", 
+    created_at: "2023-01-27T16:50:00.000Z" 
+  },
+  { 
+    id: "5", 
+    artwork_rights_holder_id: "3", 
+    media_id: "4", 
+    created_at: "2023-01-27T16:51:00.000Z" 
+  },
+  { 
+    id: "6", 
+    artwork_rights_holder_id: "4", 
+    media_id: "5", 
+    created_at: "2023-01-28T11:15:00.000Z" 
   }
 ];
 

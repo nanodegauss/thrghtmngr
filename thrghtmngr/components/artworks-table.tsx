@@ -8,6 +8,7 @@
  * - Sélection des colonnes à afficher
  * - Affichage des détails dans un panneau latéral
  * - Actions de modification et suppression
+ * - Gestion des ayants droit
  * 
  * @component
  */
@@ -36,12 +37,15 @@ import {
   ArrowUpDown,
   PencilIcon,
   TrashIcon,
+  CircleDollarSignIcon,
 } from "lucide-react"
 
 import { useArtworks } from "../hooks/useArtworks"
 import { useQuery } from "@tanstack/react-query"
-import { categoryService, mockArtworks, mockArtworkCategories } from "../services/api"
+import { categoryService, mockArtworks, mockArtworkCategories, mockArtworkRightsHolders } from "../services/api"
 import { Artwork, ArtworkStatus } from "../types"
+import { useTotalRightsCost, useRightsHolderCount } from "../hooks/useRightsHolders"
+import { formatPrice } from "@/lib/utils"
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetClose, SheetFooter } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
@@ -70,19 +74,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { RightsHolderManagement } from "./rights-holder-management"
 
 /**
  * Props du composant ArtworksTable
  * 
  * @typedef {Object} ArtworksTableProps
- * @property {Artwork[]} [artworks] - Liste d'œuvres d'art (déprécié, utilisez data à la place)
- * @property {Artwork[]} [data] - Liste d'œuvres d'art à afficher
+ * @property {Artwork[]} [artworks] - Liste d'œuvres d'art (pour compatibilité)
+ * @property {Artwork[]} [data] - Liste d'œuvres d'art à afficher (interface alternative)
  * @property {boolean} [hideProjectColumn] - Si true, masque la colonne Projet
+ * @property {string} [projectId] - ID du projet pour filtrage (optionnel)
  */
 type ArtworksTableProps = {
   artworks?: Artwork[]
   data?: Artwork[]
   hideProjectColumn?: boolean
+  projectId?: string
 }
 
 /**
@@ -91,9 +98,14 @@ type ArtworksTableProps = {
  * @param {ArtworksTableProps} props - Propriétés du composant
  * @returns {JSX.Element} - Composant de tableau d'œuvres d'art
  */
-export function ArtworksTable({ artworks, data, hideProjectColumn }: ArtworksTableProps) {
+export function ArtworksTable({ artworks, data, hideProjectColumn, projectId }: ArtworksTableProps) {
   // Unifie les données provenant de artworks ou data
   const artworksData = data || artworks || [];
+  
+  // Filtre par projet si projectId est fourni
+  const filteredData = projectId 
+    ? artworksData.filter(artwork => artwork.project_id === projectId)
+    : artworksData;
   
   // Solution temporaire : Utilisez les données mockées directement au lieu des hooks de React Query
   // à réactiver lorsque React Query sera pleinement configuré
@@ -140,6 +152,22 @@ export function ArtworksTable({ artworks, data, hideProjectColumn }: ArtworksTab
   const getCategoryName = (categoryId: string): string => {
     const category = categories?.find(cat => cat.id === categoryId);
     return category?.name || "Catégorie inconnue";
+  };
+
+  /**
+   * Récupère les informations sur les ayants droit d'une œuvre
+   * 
+   * @param {string} artworkId - ID de l'œuvre
+   * @returns {{ count: number, totalCost: number }} Nombre d'ayants droit et coût total
+   */
+  const getRightsInfo = (artworkId: string): { count: number; totalCost: number } => {
+    // Dans un environnement réel, cela utiliserait useRightsHolderCount et useTotalRightsCost
+    // Mais pour les besoins de la démo, on utilise les données mockées directement
+    const holders = mockArtworkRightsHolders.filter(h => h.artwork_id === artworkId);
+    const count = holders.length;
+    const totalCost = holders.reduce((sum, holder) => sum + holder.price, 0);
+    
+    return { count, totalCost };
   };
 
   // Définition des colonnes de la table
@@ -299,7 +327,8 @@ export function ArtworksTable({ artworks, data, hideProjectColumn }: ArtworksTab
       cell: ({ row }) => {
         // Ce serait idéal d'avoir le nom du projet ici au lieu de l'ID
         // Une fois que vous aurez un hook useProjects ou similaire
-        return row.getValue("project_id") || "Sans projet";
+        const projectData = artworksData.find(art => art.id === row.original.id);
+        return (projectData && projectData.project) || row.getValue("project_id") || "Sans projet";
       }
     },
     {
@@ -354,10 +383,59 @@ export function ArtworksTable({ artworks, data, hideProjectColumn }: ArtworksTab
       },
     },
     {
+      accessorKey: "rights",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Droits
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const artworkId = row.original.id;
+        const { count, totalCost } = getRightsInfo(artworkId);
+        
+        return (
+          <div className="space-y-1">
+            <div className="font-medium">{formatPrice(totalCost)}</div>
+            <div className="text-xs text-muted-foreground">
+              {count} ayant{count > 1 ? 's' : ''} droit
+            </div>
+          </div>
+        );
+      },
+    },
+    {
       id: "actions",
       cell: ({ row }) => {
         return (
           <div className="flex items-center gap-2">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-blue-50 hover:text-blue-600"
+                >
+                  <CircleDollarSignIcon className="h-4 w-4" />
+                  <span className="sr-only">Gérer les ayants droit</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="sm:max-w-xl w-full">
+                <RightsHolderManagement 
+                  artworkId={row.original.id}
+                  onClose={() => {
+                    // Cette fonction sera appelée lorsque l'utilisateur clique sur "Fermer"
+                    const closeButton = document.querySelector('[data-id="close-button"]');
+                    if (closeButton) {
+                      (closeButton as HTMLButtonElement).click();
+                    }
+                  }}
+                />
+              </SheetContent>
+            </Sheet>
             <Button
               variant="ghost"
               size="icon"
@@ -381,9 +459,9 @@ export function ArtworksTable({ artworks, data, hideProjectColumn }: ArtworksTab
     },
   ];
 
-  // Initialiser la table (TOUJOURS initialiser avant les retours conditionnels)
+  // Initialiser la table avec les données filtrées
   const table = useReactTable({
-    data: artworksData,
+    data: filteredData,
     columns,
     state: {
       sorting,

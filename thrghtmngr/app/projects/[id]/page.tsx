@@ -74,19 +74,6 @@ type ProjectCategory = {
   name: string
 }
 
-type FilteredArtworksTableProps = {
-  artworks: import("@/types/index").Artwork[];
-  projectId: string;
-  hideProjectColumn?: boolean; // Propriété ajoutée pour éviter l'erreur
-}
-
-function FilteredArtworksTable({ artworks, projectId, ...props }: { artworks: import("@/types/index").Artwork[], projectId: string }) {
-  const filteredArtworks = artworks.filter((artwork) => artwork.project_id === projectId)
-
-  return <ArtworksTable artworks={filteredArtworks} {...props} />
-}
-
-
 export default function ProjectDetailsPage() {
   // Extraction et validation du paramètre id
   const params = useParams()
@@ -106,45 +93,45 @@ export default function ProjectDetailsPage() {
 
     const loadProjectData = async () => {
       try {
-        const projectData = await projectService.getProjectById(id)
-        setProject(projectData || null)
+        const projectData = await projectService.getProjectById(id);
+        setProject(projectData || null);
 
         if (projectData) {
           try {
-            const artworksData = await artworkService.getArtworksByProject(id)
-            setArtworks(artworksData || [])
+            const artworksData = await artworkService.getArtworksByProject(id);
+            setArtworks(artworksData || []);
           } catch (error) {
-            console.error("Erreur lors du chargement des œuvres:", error)
-            setArtworks([])
+            console.error("Erreur lors du chargement des œuvres:", error);
+            setArtworks([]);
           }
 
           if (projectData.category_id) {
             try {
-              const categories = await categoryService.getProjectCategories()
-              const projectCategory = categories.find(cat => cat.id === projectData.category_id)
-              setCategory(projectCategory || null)
+              const categories = await categoryService.getProjectCategories();
+              const projectCategory = categories.find(cat => cat.id === projectData.category_id);
+              setCategory(projectCategory || null);
             } catch (error) {
-              console.error("Erreur lors du chargement de la catégorie:", error)
-              setCategory(null)
+              console.error("Erreur lors du chargement de la catégorie:", error);
+              setCategory(null);
             }
           }
 
           if (typeof projectData.budget === 'number' && projectData.budget > 0) {
-            const spent = Math.floor((Math.random() * 0.8 + 0.1) * projectData.budget)
-            setSpentBudget(spent)
+            const spent = Math.floor((0.5) * projectData.budget); // Utilisation d'une valeur fixe (50% du budget)
+            setSpentBudget(spent);
           }
         }
       } catch (error) {
         toast.error("Erreur lors du chargement des données", {
           description: "Impossible de charger les détails du projet"
-        })
-        console.error("Erreur:", error)
+        });
+        console.error("Erreur:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    loadProjectData()
+    loadProjectData();
   }, [id])
 
   const getStatusBadge = (status: string) => {
@@ -330,9 +317,10 @@ export default function ProjectDetailsPage() {
           Œuvres associées ({artworks.length})
         </h2>
         {artworks.length > 0 ? (
-          <FilteredArtworksTable
+          <ArtworksTable
             artworks={artworks}
             projectId={id || ""}
+            hideProjectColumn={true}
           />
         ) : (
           <div className="text-center p-6 bg-slate-50 rounded-md border">

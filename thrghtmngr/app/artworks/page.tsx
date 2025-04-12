@@ -23,24 +23,31 @@ import {
   import { Separator } from "@/components/ui/separator"
   import { SidebarTrigger } from "@/components/ui/sidebar"
   import { ArtworksTable } from "@/components/artworks-table"
-  import { mockArtworks, mockProjects } from "@/mocks/data"
+  import { mockArtworks, mockProjects, mockArtworkCategories } from "@/mocks/data"
   
   export default function ArtworksPage() {
     // Adapter le format des données mockées au format attendu par le composant ArtworksTable
     const formattedArtworks = mockArtworks.map(artwork => {
       const project = mockProjects.find(p => p.id === artwork.project_id);
-      
+      const category = mockArtworkCategories.find(c => c.id === artwork.category_id);
+
       return {
         id: artwork.id,
         status: artwork.status,
-        thumbnail: artwork.image_url,
+        image_url: artwork.image_url,
         title: artwork.title,
         author: artwork.author,
         project: project?.title || "Non assigné",
+        project_id: artwork.project_id, // Corriger pour inclure l'identifiant du projet
         exhibitNumber: artwork.exhibition_number,
+        exhibition_number: artwork.exhibition_number,
         location: artwork.reference,
+        reference: artwork.reference,
+        category: category?.name || "Non catégorisé",
+        category_id: artwork.category_id,
         origin: artwork.origin,
         rightsFee: artwork.rights_fee || 0,
+        period: artwork.period
       };
     });
   
