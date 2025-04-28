@@ -1,7 +1,25 @@
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [];
+  },
+  webSocketTimeout: 1000000,
+  experimental: {
+    serverActions: true,
+  }
 };
 
-export default nextConfig;
+module.exports = {
+  ...nextConfig,
+  async headers() {
+    return [];
+  },
+  webpack: (config) => {
+    return config;
+  },
+  images: {
+    unoptimized: true,
+  }
+};
