@@ -23,7 +23,7 @@ import { fr } from "date-fns/locale"
 // Correction du chemin d'importation
 import { projectService, artworkService, categoryService } from "@/services/api"
 // Correction de l'importation selon l'export du composant (default ou nommé)
-import ArtworksTable from "@/components/artworks-table" 
+import { ArtworksTable } from "@/components/artworks-table" 
 
 // Importations manquantes pour les composants de breadcrumb
 import {
